@@ -22,6 +22,10 @@ const required = [
   'AI小福',
   '数据概览',
   '诉求管理',
+  'V2整理版',
+  '自由咨询',
+  'AI生成诉求',
+  'AI协同闭环',
 ];
 
 const missing = required.filter((needle) => !corpus.includes(needle));

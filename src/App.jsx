@@ -156,6 +156,10 @@ export function App() {
         <div>
           <p className="eyebrow">Happy Butler Prototype</p>
           <h1>幸福管家 · 三端全流程可点击演示</h1>
+          <div className="version-note">
+            <span>V2整理版</span>
+            <b>自由咨询 → AI生成诉求 / 申报 → 后台协同闭环</b>
+          </div>
         </div>
         <nav className="mode-switch" aria-label="切换演示端">
           <button className={mode === 'resident' ? 'active' : ''} onClick={() => setMode('resident')} data-route="resident">居民端</button>
@@ -165,6 +169,12 @@ export function App() {
       </header>
 
       <section className="stage">
+        <div className="flow-rail" aria-label="V2演示主线">
+          <span><i className="ri-chat-smile-3-line" />自由咨询</span>
+          <span><i className="ri-magic-line" />AI生成诉求</span>
+          <span><i className="ri-route-line" />智能派单</span>
+          <span><i className="ri-dashboard-3-line" />AI协同闭环</span>
+        </div>
         {mode === 'resident' && (
           <PhoneFrame title="幸福管家" route={residentRoute} setRoute={setResidentRoute} accent="blue">
             {residentRoute === 'home' && <ResidentHome setRoute={setResidentRoute} requests={requests} />}
@@ -244,6 +254,10 @@ function ResidentHome({ setRoute, requests }) {
   return (
     <div className="mobile-screen resident" data-view="resident-home">
       <AiHero setRoute={setRoute} />
+      <section className="v2-guide-card">
+        <b>V2演示主线</b>
+        <p>居民不必先理解事项分类，先自由咨询小福，再由 AI 自动整理成诉求草稿。</p>
+      </section>
       <div className="search-pill"><i className="ri-search-line" /> 说说您想办理什么 <i className="ri-mic-line" /></div>
       <div className="quick-pair">
         <button onClick={() => setRoute('request')} data-action="start-resident-request"><i className="ri-user-voice-fill" />一键诉求<span>AI帮您快速提交</span></button>
@@ -396,6 +410,14 @@ function AdminDesktop({ route, setRoute, requests, stats, applications, selected
 function AdminDashboard({ stats, requests, applications, setRoute }) {
   return (
     <div className="admin-page" data-view="admin-dashboard">
+      <section className="ai-loop-panel">
+        <div>
+          <p className="eyebrow">AI协同闭环</p>
+          <h3>从自由咨询到派单办结，一条线讲清楚</h3>
+          <span>小福识别居民/企业意图，生成结构化工单，后台完成受理、派单、反馈和评价统计。</span>
+        </div>
+        <button onClick={() => setRoute('requests')}>查看诉求闭环</button>
+      </section>
       <div className="metric-row"><Metric label="诉求总量" value={stats.total} icon="ri-file-list-3-fill" delta="+12.5%" /><Metric label="已办结" value={stats.done} icon="ri-checkbox-circle-fill" delta="+15.3%" tone="green" /><Metric label="办理中" value={stats.running} icon="ri-hourglass-2-fill" delta="-6.2%" /><Metric label="满意率" value={`${stats.satisfaction}%`} icon="ri-emotion-happy-fill" delta="+2.1%" tone="purple" /></div>
       <div className="dashboard-grid"><section className="panel wide"><CardTitle title="诉求趋势" action="本月" /><div className="chart-bars">{[48, 58, 54, 70, 78, 74, 61, 69, 82, 76, 88, 94].map((h, i) => <span key={i} style={{ height: `${h}%` }} />)}</div></section><section className="panel"><CardTitle title="诉求类型分布" action="1,256" /><div className="donut"><span>{stats.total}<small>总数</small></span></div><div className="legend"><p><b className="blue-dot" />环境卫生 35.6%</p><p><b className="green-dot" />设施设备 24.8%</p><p><b className="orange-dot" />物业服务 16.7%</p></div></section></div>
       <section className="panel"><CardTitle title="最新诉求" action="查看更多" onClick={() => setRoute('requests')} /><AdminTable requests={requests.slice(0, 5)} compact /></section>
