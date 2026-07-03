@@ -8,13 +8,8 @@ const initialRequests = [
 
 const serviceCards = [
   ['找党员', '党员先锋服务', 'ri-user-star-line', '#FF4D3F'],
-  ['便民服务', '水电燃气与预约', 'ri-service-line', '#1A6DF8'],
-  ['生活缴费', '常用缴费入口', 'ri-drop-line', '#00B578'],
-  ['社区活动', '邻里活动报名', 'ri-group-line', '#8B5CF6'],
   ['报事报修', '设施故障上报', 'ri-tools-line', '#FF8F1F'],
   ['政策咨询', 'AI政策问答', 'ri-question-answer-line', '#2878FF'],
-  ['邻里互助', '互助需求发布', 'ri-heart-3-line', '#16C784'],
-  ['更多服务', '全部事项', 'ri-apps-2-line', '#64748B'],
 ];
 
 const partyMembers = [
@@ -24,9 +19,9 @@ const partyMembers = [
 ];
 
 const policies = [
-  { title: '小微企业稳岗补贴申报指南', tag: '用工', match: 92, desc: '符合连续缴纳社保、稳定就业岗位等条件的企业可在线申报。' },
-  { title: '科技型企业研发费用加计扣除', tag: '税务', match: 87, desc: 'AI小福已匹配贵司研发投入与人员规模，建议优先关注材料清单。' },
-  { title: '社区商业空间租金减免政策', tag: '经营', match: 78, desc: '适用于社区便民商业、养老托育配套等场景。' },
+  { title: '养老助餐服务申请指引', tag: '民生', match: 92, desc: '面向社区长者的助餐申请条件、材料和办理时限说明。' },
+  { title: '居住证明办理指南', tag: '政务', match: 87, desc: '说明实名信息、居住地址和社区核验材料的办理要求。' },
+  { title: '维修基金咨询口径', tag: '物业', match: 78, desc: '用于解释维修基金使用范围、咨询流程和反馈渠道。' },
 ];
 
 const adminModules = [
@@ -34,7 +29,6 @@ const adminModules = [
   ['requests', '诉求管理', 'ri-file-list-3-line'],
   ['party', '党员管理', 'ri-shield-user-line'],
   ['services', '服务事项', 'ri-layout-grid-line'],
-  ['enterprisePkg', '企业服务包', 'ri-briefcase-4-line'],
   ['policy', '政策管理', 'ri-government-line'],
   ['announce', '公告管理', 'ri-megaphone-line'],
   ['users', '用户管理', 'ri-team-line'],
@@ -51,18 +45,15 @@ function statusTone(status) {
 export function App() {
   const [mode, setMode] = useState('resident');
   const [residentRoute, setResidentRoute] = useState('home');
-  const [enterpriseRoute, setEnterpriseRoute] = useState('home');
   const [adminRoute, setAdminRoute] = useState('dashboard');
   const [requests, setRequests] = useState(initialRequests);
-  const [applications, setApplications] = useState([{ id: 'QY20240625001', name: '稳岗补贴申报', status: '材料预审中', time: '06-25 10:22' }]);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [toast, setToast] = useState('欢迎使用幸福管家高保真原型');
   const [draft, setDraft] = useState({ category: '设施报修', desc: '小区东门路灯连续两晚不亮，希望尽快维修。' });
   const [aiQuestion, setAiQuestion] = useState('我想咨询一下，小区噪音扰民应该怎么处理？');
   const [chatMessages, setChatMessages] = useState([
-    { role: 'ai', text: '您好，我是AI小福。社区服务、政策咨询、报事报修、生活缴费、党员服务都可以直接问我。' },
+    { role: 'ai', text: '您好，我是AI小福。社区服务、政策咨询、报事报修、党员服务都可以直接问我。' },
   ]);
-  const [enterpriseDraft, setEnterpriseDraft] = useState({ name: '稳岗补贴申报', contact: '周经理', material: false });
 
   const stats = useMemo(() => {
     const total = requests.length;
@@ -143,27 +134,19 @@ export function App() {
     timeline: [...request.timeline, '居民五星评价：非常满意'],
   }, '评价已提交，后台满意率已刷新');
 
-  const submitEnterpriseApplication = () => {
-    const next = { id: `QY20260625${String(applications.length + 1).padStart(3, '0')}`, name: enterpriseDraft.name, status: '材料预审中', time: '刚刚' };
-    setApplications((items) => [next, ...items]);
-    setEnterpriseRoute('center');
-    showToast('企业申报已提交，申报记录已更新');
-  };
-
   return (
     <main className="prototype" data-mode={mode}>
       <header className="stage-header">
         <div>
           <p className="eyebrow">Happy Butler Prototype</p>
-          <h1>幸福管家 · 三端全流程可点击演示</h1>
+          <h1>幸福管家 · 双端全流程可点击演示</h1>
           <div className="version-note">
             <span>V2整理版</span>
-            <b>自由咨询 → AI生成诉求 / 申报 → 后台协同闭环</b>
+            <b>自由咨询 → AI生成诉求 → 后台协同闭环</b>
           </div>
         </div>
         <nav className="mode-switch" aria-label="切换演示端">
           <button className={mode === 'resident' ? 'active' : ''} onClick={() => setMode('resident')} data-route="resident">居民端</button>
-          <button className={mode === 'enterprise' ? 'active' : ''} onClick={() => setMode('enterprise')} data-route="enterprise">企业端</button>
           <button className={mode === 'admin' ? 'active' : ''} onClick={() => setMode('admin')} data-route="admin">后台管理</button>
         </nav>
       </header>
@@ -185,23 +168,12 @@ export function App() {
           </PhoneFrame>
         )}
 
-        {mode === 'enterprise' && (
-          <PhoneFrame title="企业服务" route={enterpriseRoute} setRoute={setEnterpriseRoute} accent="green" enterprise>
-            {enterpriseRoute === 'home' && <EnterpriseHome setRoute={setEnterpriseRoute} applications={applications} />}
-            {enterpriseRoute === 'package' && <EnterprisePackage />}
-            {enterpriseRoute === 'policy' && <EnterprisePolicy />}
-            {enterpriseRoute === 'apply' && <EnterpriseApply draft={enterpriseDraft} setDraft={setEnterpriseDraft} submit={submitEnterpriseApplication} />}
-            {enterpriseRoute === 'center' && <EnterpriseCenter applications={applications} />}
-          </PhoneFrame>
-        )}
-
         {mode === 'admin' && (
           <AdminDesktop
             route={adminRoute}
             setRoute={setAdminRoute}
             requests={requests}
             stats={stats}
-            applications={applications}
             selectedRequest={selectedRequest}
             setSelectedRequest={setSelectedRequest}
             dispatchRequest={dispatchRequest}
@@ -215,10 +187,8 @@ export function App() {
   );
 }
 
-function PhoneFrame({ title, route, setRoute, children, accent, enterprise = false }) {
-  const tabs = enterprise
-    ? [['home', '首页', 'ri-home-5-fill'], ['package', '服务包', 'ri-briefcase-4-fill'], ['policy', '政策', 'ri-file-search-fill'], ['apply', '申报', 'ri-edit-box-fill'], ['center', '我的', 'ri-user-3-fill']]
-    : [['home', '首页', 'ri-home-5-fill'], ['services', '服务', 'ri-grid-fill'], ['request', '小福', 'ri-robot-2-fill'], ['progress', '消息', 'ri-chat-3-fill'], ['profile', '我的', 'ri-user-3-fill']];
+function PhoneFrame({ title, route, setRoute, children, accent }) {
+  const tabs = [['home', '首页', 'ri-home-5-fill'], ['services', '服务', 'ri-grid-fill'], ['request', '小福', 'ri-robot-2-fill'], ['progress', '消息', 'ri-chat-3-fill'], ['profile', '我的', 'ri-user-3-fill']];
   return (
     <div className={`phone-frame ${accent}`}>
       <div className="phone-status"><span>9:41</span><span><i className="ri-wifi-fill" /> 100%</span></div>
@@ -237,15 +207,15 @@ function PhoneFrame({ title, route, setRoute, children, accent, enterprise = fal
   );
 }
 
-function AiHero({ setRoute, enterprise = false }) {
+function AiHero({ setRoute }) {
   return (
-    <section className={`ai-hero ${enterprise ? 'enterprise' : ''}`}>
+    <section className="ai-hero">
       <div className="ai-face"><i className="ri-robot-2-fill" /></div>
       <div>
-        <h2>{enterprise ? '小福企业服务助手' : 'AI小福智能助手'}</h2>
-        <p>{enterprise ? '政策匹配、申报预审、企业诉求一站办' : '有问题，找小福；诉求填报快一步'}</p>
+        <h2>AI小福智能助手</h2>
+        <p>有问题，找小福；诉求填报快一步</p>
       </div>
-      <button onClick={() => setRoute(enterprise ? 'policy' : 'request')}>立即咨询</button>
+      <button onClick={() => setRoute('request')}>立即咨询</button>
     </section>
   );
 }
@@ -291,11 +261,11 @@ function ResidentRequest({ draft, setDraft, submit, aiQuestion, setAiQuestion, c
           {chatMessages.map((message, index) => <div className={`bubble ${message.role}`} key={`${message.role}-${index}`}>{message.text}</div>)}
         </div>
         <div className="question-box">
-          <textarea value={aiQuestion} onChange={(event) => setAiQuestion(event.target.value)} placeholder="比如：楼上噪音扰民怎么办？老人助餐怎么申请？企业政策可以咨询谁？" />
+          <textarea value={aiQuestion} onChange={(event) => setAiQuestion(event.target.value)} placeholder="比如：楼上噪音扰民怎么办？老人助餐怎么申请？设施维修怎么跟进？" />
           <button className="primary" onClick={askAiQuestion} data-action="ask-ai-question">随便问小福</button>
         </div>
         <div className="prompt-row">
-          {['物业纠纷怎么处理？', '老人助餐如何申请？', '周末社区有什么活动？'].map((item) => <button key={item} onClick={() => setAiQuestion(item)}>{item}</button>)}
+          {['物业纠纷怎么处理？', '老人助餐如何申请？', '路灯维修怎么跟进？'].map((item) => <button key={item} onClick={() => setAiQuestion(item)}>{item}</button>)}
         </div>
         <button className="primary ghost" onClick={convertAiAnswerToRequest} data-action="convert-ai-answer-to-request">把咨询内容转为诉求草稿</button>
       </section>
@@ -333,7 +303,7 @@ function ResidentServices() {
   return (
     <div className="mobile-screen" data-view="resident-services">
       <CardTitle title="服务事项" action="智能排序" />
-      {['居住证明办理', '养老助餐申请', '维修基金咨询', '社区活动报名'].map((item, index) => <section className="list-card" key={item}><i className={['ri-file-list-3-line', 'ri-restaurant-2-line', 'ri-bank-card-line', 'ri-calendar-event-line'][index]} /><div><h3>{item}</h3><p>办理材料、办理时限、咨询入口已整理</p></div><button>查看</button></section>)}
+      {['居住证明办理', '养老助餐申请', '维修基金咨询', '党员志愿服务预约'].map((item, index) => <section className="list-card" key={item}><i className={['ri-file-list-3-line', 'ri-restaurant-2-line', 'ri-bank-card-line', 'ri-shield-user-line'][index]} /><div><h3>{item}</h3><p>办理材料、办理时限、咨询入口已整理</p></div><button>查看</button></section>)}
       <CardTitle title="党员服务" action="3人在线" />
       {partyMembers.map((member) => <section className="member-card" key={member.name}><div className="avatar">{member.name.slice(0, 1)}</div><div><h3>{member.name}</h3><p>{member.role} · 响应率 {member.score}</p><div>{member.tags.map((tag) => <Badge key={tag}>{tag}</Badge>)}</div></div></section>)}
     </div>
@@ -350,45 +320,7 @@ function ResidentProfile({ requests }) {
   );
 }
 
-function EnterpriseHome({ setRoute, applications }) {
-  return (
-    <div className="mobile-screen enterprise" data-view="enterprise-home">
-      <AiHero setRoute={setRoute} enterprise />
-      <section className="policy-match"><div><p>今日政策匹配</p><h2>92%</h2><span>3项政策建议立即查看</span></div><button onClick={() => setRoute('policy')}>查看解读</button></section>
-      <div className="quick-pair"><button onClick={() => setRoute('package')}><i className="ri-briefcase-4-fill" />企业服务包<span>从开办到兑现</span></button><button onClick={() => setRoute('apply')}><i className="ri-edit-box-fill" />在线申报<span>材料预审更快</span></button></div>
-      <CardTitle title="最新申报" action={`${applications.length}条`} onClick={() => setRoute('center')} />
-      {applications.map((item) => <section className="list-card" key={item.id}><i className="ri-file-check-line" /><div><h3>{item.name}</h3><p>{item.id} · {item.time}</p></div><Badge tone="blue">{item.status}</Badge></section>)}
-    </div>
-  );
-}
-
-function EnterprisePackage() {
-  return <div className="mobile-screen" data-view="enterprise-package"><CardTitle title="企业服务包" action="场景服务" />{['企业开办一件事', '用工稳岗服务包', '融资对接服务包', '政策兑现服务包'].map((item, index) => <section className="package-card" key={item}><i className={['ri-store-2-line', 'ri-team-line', 'ri-funds-line', 'ri-coupon-3-line'][index]} /><div><h3>{item}</h3><p>智能材料清单、在线预约、进度追踪</p></div><button>进入</button></section>)}</div>;
-}
-
-function EnterprisePolicy() {
-  return <div className="mobile-screen" data-view="enterprise-policy"><CardTitle title="政策解读" action="AI匹配" />{policies.map((policy) => <section className="policy-card" key={policy.title}><div className="row-between"><Badge tone="green">{policy.tag}</Badge><span>{policy.match}% 匹配</span></div><h3>{policy.title}</h3><p>{policy.desc}</p><button className="primary ghost">AI解读</button></section>)}</div>;
-}
-
-function EnterpriseApply({ draft, setDraft, submit }) {
-  return (
-    <div className="mobile-screen" data-view="enterprise-apply">
-      <section className="form-card glow green">
-        <h2>在线申报</h2><p>材料上传为原型模拟，提交后进入企业中心记录。</p>
-        <label>申报事项</label><input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
-        <label>联系人</label><input value={draft.contact} onChange={(event) => setDraft({ ...draft, contact: event.target.value })} />
-        <button className={`upload ${draft.material ? 'done' : ''}`} onClick={() => setDraft({ ...draft, material: true })}><i className="ri-upload-cloud-2-line" />{draft.material ? '材料已上传' : '模拟上传材料'}</button>
-        <button className="primary green" onClick={submit} data-action="submit-enterprise-application">提交申报</button>
-      </section>
-    </div>
-  );
-}
-
-function EnterpriseCenter({ applications }) {
-  return <div className="mobile-screen" data-view="enterprise-center"><section className="profile-card green"><div className="avatar large">企</div><div><h2>幸福社区便民科技有限公司</h2><p>统一信用代码 9131********826</p></div></section><CardTitle title="申报记录" action="全部" />{applications.map((item) => <section className="list-card" key={item.id}><i className="ri-article-line" /><div><h3>{item.name}</h3><p>{item.id} · {item.time}</p></div><Badge tone="green">{item.status}</Badge></section>)}</div>;
-}
-
-function AdminDesktop({ route, setRoute, requests, stats, applications, selectedRequest, setSelectedRequest, dispatchRequest, completeRequest }) {
+function AdminDesktop({ route, setRoute, requests, stats, selectedRequest, setSelectedRequest, dispatchRequest, completeRequest }) {
   return (
     <div className="admin-desktop" data-view="admin">
       <aside className="admin-sidebar">
@@ -398,7 +330,7 @@ function AdminDesktop({ route, setRoute, requests, stats, applications, selected
       </aside>
       <section className="admin-main">
         <div className="admin-topbar"><h2>{adminModules.find(([key]) => key === route)?.[1]}</h2><div className="admin-search"><i className="ri-search-line" /> 搜索工单、用户、政策</div><button className="top-action"><i className="ri-notification-3-line" />消息</button></div>
-        {route === 'dashboard' && <AdminDashboard stats={stats} requests={requests} applications={applications} setRoute={setRoute} />}
+        {route === 'dashboard' && <AdminDashboard stats={stats} requests={requests} setRoute={setRoute} />}
         {route === 'requests' && <AdminRequests requests={requests} setSelectedRequest={setSelectedRequest} />}
         {route !== 'dashboard' && route !== 'requests' && <AdminModule route={route} />}
       </section>
@@ -407,21 +339,20 @@ function AdminDesktop({ route, setRoute, requests, stats, applications, selected
   );
 }
 
-function AdminDashboard({ stats, requests, applications, setRoute }) {
+function AdminDashboard({ stats, requests, setRoute }) {
   return (
     <div className="admin-page" data-view="admin-dashboard">
       <section className="ai-loop-panel">
         <div>
           <p className="eyebrow">AI协同闭环</p>
           <h3>从自由咨询到派单办结，一条线讲清楚</h3>
-          <span>小福识别居民/企业意图，生成结构化工单，后台完成受理、派单、反馈和评价统计。</span>
+          <span>小福识别居民意图，生成结构化工单，后台完成受理、派单、反馈和评价统计。</span>
         </div>
         <button onClick={() => setRoute('requests')}>查看诉求闭环</button>
       </section>
       <div className="metric-row"><Metric label="诉求总量" value={stats.total} icon="ri-file-list-3-fill" delta="+12.5%" /><Metric label="已办结" value={stats.done} icon="ri-checkbox-circle-fill" delta="+15.3%" tone="green" /><Metric label="办理中" value={stats.running} icon="ri-hourglass-2-fill" delta="-6.2%" /><Metric label="满意率" value={`${stats.satisfaction}%`} icon="ri-emotion-happy-fill" delta="+2.1%" tone="purple" /></div>
       <div className="dashboard-grid"><section className="panel wide"><CardTitle title="诉求趋势" action="本月" /><div className="chart-bars">{[48, 58, 54, 70, 78, 74, 61, 69, 82, 76, 88, 94].map((h, i) => <span key={i} style={{ height: `${h}%` }} />)}</div></section><section className="panel"><CardTitle title="诉求类型分布" action="1,256" /><div className="donut"><span>{stats.total}<small>总数</small></span></div><div className="legend"><p><b className="blue-dot" />环境卫生 35.6%</p><p><b className="green-dot" />设施设备 24.8%</p><p><b className="orange-dot" />物业服务 16.7%</p></div></section></div>
       <section className="panel"><CardTitle title="最新诉求" action="查看更多" onClick={() => setRoute('requests')} /><AdminTable requests={requests.slice(0, 5)} compact /></section>
-      <section className="panel row-panel"><div><h3>企业申报协同</h3><p>{applications.length} 条企业申报正在预审，AI已完成材料完整性检查。</p></div><button onClick={() => setRoute('enterprisePkg')}>查看企业服务包</button></section>
     </div>
   );
 }
@@ -438,10 +369,9 @@ function AdminModule({ route }) {
   const maps = {
     party: ['党员管理', partyMembers.map((m) => [m.name, m.role, `响应率 ${m.score}`, '在线'])],
     services: ['服务事项', [['居住证明办理', '政务服务', '1个工作日', '已上线'], ['设施报修', '社区服务', '2小时响应', '已上线'], ['养老助餐申请', '民生服务', '即办', '已上线']]],
-    enterprisePkg: ['企业服务包', [['稳岗补贴申报', '用工服务', '23家企业', '进行中'], ['融资对接服务包', '金融服务', '8家企业', '已上线'], ['政策兑现服务包', '政策服务', '17家企业', '进行中']]],
     policy: ['政策管理', policies.map((p) => [p.title, p.tag, `${p.match}%匹配`, '已发布'])],
-    announce: ['公告管理', [['电梯检修通知', '居民公告', '06-25', '已发布'], ['社区活动报名', '活动公告', '06-24', '已发布'], ['防汛温馨提示', '安全公告', '草稿']]],
-    users: ['用户管理', [['王女士', '居民', '第三网格', '正常'], ['幸福社区便民科技有限公司', '企业', '重点企业', '正常'], ['张管理员', '后台账号', '社区管理员', '正常']]],
+    announce: ['公告管理', [['电梯检修通知', '居民公告', '06-25', '已发布'], ['消防演练提醒', '安全公告', '06-24', '已发布'], ['防汛温馨提示', '安全公告', '草稿']]],
+    users: ['用户管理', [['王女士', '居民', '第三网格', '正常'], ['李先生', '居民', '第二网格', '正常'], ['张管理员', '后台账号', '社区管理员', '正常']]],
     ai: ['AI知识库', [['诉求分类规则', '命中 1,246 次', '06-25更新', '启用'], ['政策问答库', '命中 806 次', '06-24更新', '启用'], ['服务事项口径', '命中 512 次', '06-22更新', '启用']]],
   };
   const [title, rows] = maps[route];
